@@ -1,0 +1,55 @@
+package neuralnetjava.network.mnistReader;
+
+import java.io.*;
+
+public class MnistDataReader  {
+
+    public static MnistMatrixData[] readData(String dataFilePath, String labelFilePath) throws IOException {
+
+        DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(dataFilePath)));
+        int magicNumber = dataInputStream.readInt();
+        int numberOfItems = dataInputStream.readInt();
+        int nRows = dataInputStream.readInt();
+        int nCols = dataInputStream.readInt();
+
+        System.out.println("magic number is " + magicNumber);
+        System.out.println("number of items is " + numberOfItems);
+        System.out.println("number of rows is: " + nRows);
+        System.out.println("number of cols is: " + nCols);
+
+        DataInputStream labelInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(labelFilePath)));
+        int labelMagicNumber = labelInputStream.readInt();
+        int numberOfLabels = labelInputStream.readInt();
+
+        System.out.println("labels magic number is: " + labelMagicNumber);
+        System.out.println("number of labels is: " + numberOfLabels);
+
+        MnistMatrixData[] data = new MnistMatrixData[numberOfItems];
+
+        assert numberOfItems == numberOfLabels;
+
+        for(int i = 0; i < numberOfItems; i++) {
+            MnistMatrixData mnistMatrix = new MnistMatrixData(nRows, nCols);
+            mnistMatrix.setLabel(labelInputStream.readUnsignedByte());
+            for (int r = 0; r < nRows; r++) {
+                for (int c = 0; c < nCols; c++) {
+                    mnistMatrix.setValue(r, c, dataInputStream.readUnsignedByte());
+                }
+            }
+            data[i] = mnistMatrix;
+        }
+        dataInputStream.close();
+        labelInputStream.close();
+        return data;
+    }
+
+    public static void printMnistMatrix(final MnistMatrixData matrix) {
+        System.out.println("label: " + matrix.getLabel());
+        for (int r = 0; r < matrix.getNumberOfRows(); r++ ) {
+            for (int c = 0; c < matrix.getNumberOfColumns(); c++) {
+                System.out.print(matrix.getValue(r, c) + " ");
+            }
+            System.out.println();
+        }
+    }
+}
